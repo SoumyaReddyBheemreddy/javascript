@@ -2,16 +2,9 @@ const tables =  [
     {
         "id":1,
         "name":"Table-1",
-        "totalCost":250,
-        "totalItems":1,
-        "orders":[
-                    {
-                    "id":1,
-                    "name":"Veg Biriyani",
-                    "quantity":1,
-                    "cost":250
-                    }
-                ]
+        "totalCost":0,
+        "totalItems":0,
+        "orders":[]
     },
     {
         "id":2,
@@ -73,7 +66,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
             let tableTitle = document.createElement("h5");
             let tableCost = document.createElement("h6");
             tableCard.setAttribute("class","card mt-2 table");
-            tableCard.setAttribute("id","table-"+tables[i].id);
+            tableCard.setAttribute("id","table-"+(i+1));
             tableCard.setAttribute("data-toggle","modal");
             tableCard.setAttribute("data-target","#exampleModal");
             tableBody.setAttribute("class","card-body");
@@ -85,12 +78,14 @@ document.addEventListener("DOMContentLoaded",  function load(){
             tableBody.appendChild(tableCost);
             tableCard.appendChild(tableBody);
             document.getElementById("table-container").appendChild(tableCard);
-            document.getElementById("table-"+tables[i].id).addEventListener("click",()=>{
+            document.getElementById("table-"+(i+1)).addEventListener("click",()=>{
                 
                 tableDetails(tables[i])
             });
-
-      
+            document.getElementById("table-"+(i+1)).addEventListener("dragover",(event)=>{
+                event.preventDefault();
+            });
+            document.getElementById("table-"+(i+1)).addEventListener("drop",dragDrop);
         }
         
         //loading menu item details
@@ -102,7 +97,9 @@ document.addEventListener("DOMContentLoaded",  function load(){
             if(i===items.length-1)
                 itemCard.setAttribute("class","card mt-2 mb-2 menu");
             else
-                itemCard.setAttribute("class","card mt-2 menu");   
+                itemCard.setAttribute("class","card mt-2 menu");
+            itemCard.setAttribute("id","item-"+(i+1));    
+            itemCard.setAttribute("draggable","true");       
             itemBody.setAttribute("class","card-body");
             itemTitle.setAttribute("class","card-title");
             itemCost.setAttribute("class","card-subtitle mb-2 text-muted");
@@ -112,6 +109,9 @@ document.addEventListener("DOMContentLoaded",  function load(){
             itemBody.appendChild(itemCost);
             itemCard.appendChild(itemBody);
             document.getElementById("menu-container").appendChild(itemCard);
+            document.getElementById("item-"+(i+1)).addEventListener("dragstart",(event)=>{
+                event.dataTransfer.setData("dropItem",event.target.id );
+            });
         }
         // model
         let model = document.createElement("div");
@@ -264,4 +264,33 @@ function tableDetails(table){
     document.getElementById("modelFooterClose").addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
     })
+}
+
+function dragDrop(event){
+    event.preventDefault();
+    let tableIdName = this.id;
+    let droppedItem = event.dataTransfer.getData("dropItem");
+    let itemId = parseInt(droppedItem.substring(5));
+    let tableId = parseInt(tableIdName.substring(6));
+    let orderId;
+    for(let i = 0;i<tables[tableId-1].orders.length;i++){
+        let order = tables[tableId-1].orders[i];
+        if(order.id===items[itemId-1].id){
+            orderId = i;
+            tables[tableId-1].orders[orderId].quantity+=1;
+            break;
+        }
+    }
+    if(isNaN(orderId)){
+        tables[tableId-1].orders.push(items[itemId-1]);
+        orderId = tables[tableId-1].orders.length-1;
+        tables[tableId-1].orders[orderId].quantity=1;
+    }
+    tables[tableId-1].totalCost=0;
+    for(let i = 0;i<tables[tableId-1].orders.length;i++){
+        tables[tableId-1].totalCost+=(tables[tableId-1].orders[i].cost)*(tables[tableId-1].orders[i].quantity);
+       
+    }
+    tables[tableId-1].totalItems+=1;
+    document.getElementById(tableIdName).children[0].children[1].innerHTML=`cost: ${tables[tableId-1].totalCost} | total items: ${tables[tableId-1].totalItems}`
 }
