@@ -27,37 +27,44 @@ const items=[
     {
         "id":1,
         "name":"Veg Biriyani",
-        "cost":250
+        "cost":250,
+        "course":"main"
     },
     {
       "id":2,
       "name":"Chicken Biriyani",
-      "cost":350
+      "cost":350,
+      "course":"main"
     },
     {
         "id":3,
         "name":"French Fries",
-        "cost":105
+        "cost":105,
+        "course":"entree"
     },
     {
       "id":4,
       "name":"French Fries with Cheese",
-      "cost":135 
+      "cost":135,
+      "course":"entree" 
     },
     {
         "id":5,
         "name":"Special Veg Biriyani",
-        "cost":300
+        "cost":300,
+        "course":"special"
     },
     {
         "id":6,
         "name":"Boneless Chicken Biriyani",
-        "cost":400
+        "cost":400,
+        "course":"special"
     },
     {
         "id":7,
         "name":"Paneer 65",
-        "cost":200
+        "cost":200,
+        "course":"entree"
     }  
   ]
 document.addEventListener("DOMContentLoaded",  function load(){
@@ -96,6 +103,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
             let itemBody = document.createElement("div");
             let itemTitle = document.createElement("h5");
             let itemCost = document.createElement("h6");
+            let itemCourseType = document.createElement("h6");
             if(i===items.length-1)
                 itemCard.setAttribute("class","card mt-2 mb-2 menu");
             else
@@ -105,10 +113,13 @@ document.addEventListener("DOMContentLoaded",  function load(){
             itemBody.setAttribute("class","card-body");
             itemTitle.setAttribute("class","card-title");
             itemCost.setAttribute("class","card-subtitle mb-2 text-muted");
+            itemCourseType.setAttribute("class","card-subtitle mb-2 text-muted d-none");
             itemTitle.innerHTML = `${items[i].name}`;
             itemCost.innerHTML = `cost: ${items[i].cost}`;
+            itemCourseType.innerHTML=`${items[i].course}`;
             itemBody.appendChild(itemTitle);
             itemBody.appendChild(itemCost);
+            itemBody.appendChild(itemCourseType);
             itemCard.appendChild(itemBody);
             document.getElementById("menu-container").appendChild(itemCard);
             document.getElementById("item-"+(i+1)).addEventListener("dragstart",(event)=>{
@@ -153,7 +164,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
         closeButton.setAttribute("type","button");
         closeButton.setAttribute("class","btn btn-secondary");
         closeButton.setAttribute("data-dismiss","modal");
-        closeButton.innerHTML = "Close";
+        closeButton.innerHTML = "CLOSE SESSION (GENERATE BILL)";
         modelFooter.appendChild(closeButton);
         modelHeader.appendChild(modelTitle);
         modelHeader.appendChild(headerClose);
@@ -171,20 +182,19 @@ document.addEventListener("DOMContentLoaded",  function load(){
 function searchMenu(){
     let allCards = document.getElementsByClassName("card menu");
     let searchText = document.getElementById("searchMenuName").value.toUpperCase();
-    console.log(searchText);
     for(let index=0;index<allCards.length;index++){
         let item = allCards[index].children[0].children[0].innerHTML.toUpperCase();
-        if(item.includes(searchText))
+        let course = allCards[index].children[0].children[2].innerHTML.toUpperCase();
+        if(item.includes(searchText) || course.includes(searchText))
             allCards[index].style.display = "block";
         else
-        allCards[index].style.display = "none";
+            allCards[index].style.display = "none";
     }   
 }
 //search table function
 function searchTable(){
     let allCards = document.getElementsByClassName("card table");
     let searchText = document.getElementById("searchTableName").value.toUpperCase();
-    console.log(searchText);
     
     for(let index=0;index<allCards.length;index++){
         let item = allCards[index].children[0].children[0].innerHTML.toUpperCase();
@@ -242,6 +252,7 @@ function tableDetails(table){
         let td3 = document.createElement("td");
         td3.innerHTML=table.orders[i].cost;
         let td4 = document.createElement("input");
+        td4.setAttribute("id","itemQuantity-"+(i+1));
         td4.setAttribute("type","number");
         td4.setAttribute("class","form-control form-control-sm my-2");
         td4.setAttribute("min","1");
@@ -258,20 +269,29 @@ function tableDetails(table){
         tableRow1.appendChild(td4);
         tableRow1.appendChild(td5);
         tableBody.appendChild(tableRow1);
+        td4.addEventListener("input",()=>{updateItemQuatity(table,i)});
         deleteButton.addEventListener("click",()=>{
             deleteOrder(table,i)
-        })
+        });
       
     }
+    let totalPrice = document.createElement("p");
+    totalPrice.setAttribute("id","modalTotalPrice");
+    totalPrice.setAttribute("class","text-center");
+    totalPrice.innerHTML=`Total Price: ${table.totalCost}`;
     displayTable.appendChild(tableBody);
     modelBody.appendChild(displayTable);
-    
+    modelBody.appendChild(totalPrice);
     document.getElementById("modelHeaderClose").addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
         }
     )
     document.getElementById("modelFooterClose").addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
+        table.orders = [];
+        table.totalCost=0;
+        table.totalItems=0;
+        document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
     })
 }
 // drag and drop function
@@ -307,15 +327,27 @@ function calculateTotalCost(table){
     }
     return totalCost;
 }
+//remove order item from table
 function deleteOrder(table,index){
-    let orderIndex=0;
-    for(let i = 0 ; i < items;i++){
-        if(index===items[i].id)
-            orderIndex = i;
-    }
-    table.totalItems -= table.orders[orderIndex].quantity;
-    table.orders.splice(orderIndex,1);
+    table.totalItems -= table.orders[index].quantity;
+    table.orders.splice(index,1);
     table.totalCost = calculateTotalCost(table);
     tableDetails(table);
+    document.getElementById("modalTotalPrice").innerHTML = `Total Price: ${table.totalCost}`;
     document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
+}
+function updateItemQuatity(table,index){
+    let order=table.orders[index]
+    order.quantity = parseInt(document.getElementById("itemQuantity-"+(index+1)).value);
+    table.totalItems = updatedTotalQuantity(table);
+    table.totalCost=calculateTotalCost(table);
+    document.getElementById("modalTotalPrice").innerHTML = `Total Price: ${table.totalCost}`;
+    document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
+}
+function updatedTotalQuantity(table){
+    let totalItems = 0;
+    for(let i = 0;i<table.orders.length;i++){
+        totalItems+=table.orders[i].quantity;
+    } 
+    return totalItems;    
 }
