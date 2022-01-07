@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
             tableCard.setAttribute("data-target","#exampleModal");
             tableBody.setAttribute("class","card-body");
             tableTitle.setAttribute("class","card-title");
-            tableCost.setAttribute("class","card-subtitle mb-2 text-muted");
+            tableCost.setAttribute("class","card-subtitle mb-2 text-muted pt-2");
             tableTitle.innerHTML = `${tables[i].name}`;
             tableCost.innerHTML = `cost: ${tables[i].totalCost} | total items: ${tables[i].totalItems}`;
             tableBody.appendChild(tableTitle);
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
             itemCard.setAttribute("draggable","true");       
             itemBody.setAttribute("class","card-body");
             itemTitle.setAttribute("class","card-title");
-            itemCost.setAttribute("class","card-subtitle mb-2 text-muted");
+            itemCost.setAttribute("class","card-subtitle mb-2 text-muted pt-2");
             itemCourseType.setAttribute("class","card-subtitle mb-2 text-muted d-none");
             itemTitle.innerHTML = `${items[i].name}`;
             itemCost.innerHTML = `cost: ${items[i].cost}`;
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
         modelContent.setAttribute("class","modal-content");
         //model header
         let modelHeader = document.createElement("div");
-        modelHeader.setAttribute("class","modal-header");
+        modelHeader.setAttribute("class","modal-header bg-primary text-white");
         let modelTitle = document.createElement("h5");
         modelTitle.setAttribute("class","modal-title");
         modelTitle.setAttribute("id","exampleModalLabel");
