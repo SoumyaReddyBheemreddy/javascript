@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
         let headerClose = document.createElement("button");
         headerClose.setAttribute("id","modelHeaderClose")
         headerClose.setAttribute("type","button");
-        headerClose.setAttribute("class","btn-close");
+        headerClose.setAttribute("class","btn-close btn-close-white");
         headerClose.setAttribute("data-dismiss","modal");
         headerClose.setAttribute("aria-label","Close");
         //model body
@@ -256,6 +256,7 @@ function tableDetails(table){
         td4.setAttribute("type","number");
         td4.setAttribute("class","form-control form-control-sm my-2");
         td4.setAttribute("min","1");
+        td4.setAttribute("value",table.orders[i].quantity);
         td4.setAttribute("placeholder",table.orders[i].quantity);
         let td5 = document.createElement("td");
         let deleteButton = document.createElement("button");
