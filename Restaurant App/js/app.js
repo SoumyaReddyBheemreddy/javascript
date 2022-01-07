@@ -1,3 +1,4 @@
+//list of tables
 const tables =  [
     {
         "id":1,
@@ -21,6 +22,7 @@ const tables =  [
         "orders":[]
     }
 ];
+//menu items
 const items=[
     {
         "id":1,
@@ -113,7 +115,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
                 event.dataTransfer.setData("dropItem",event.target.id );
             });
         }
-        // model
+        // setting  model
         let model = document.createElement("div");
         model.setAttribute("class","modal fade");
         model.setAttribute("id","exampleModal");
@@ -126,7 +128,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
         modelDialog.setAttribute("role","document");
         let modelContent = document.createElement("div");
         modelContent.setAttribute("class","modal-content");
-        //header
+        //model header
         let modelHeader = document.createElement("div");
         modelHeader.setAttribute("class","modal-header");
         let modelTitle = document.createElement("h5");
@@ -139,11 +141,11 @@ document.addEventListener("DOMContentLoaded",  function load(){
         headerClose.setAttribute("class","btn-close");
         headerClose.setAttribute("data-dismiss","modal");
         headerClose.setAttribute("aria-label","Close");
-        //body
+        //model body
         let modelBody = document.createElement("div");
         modelBody.setAttribute("class","modal-body");
         modelBody.setAttribute("id","modelBodyId");
-        //footer
+        //model footer
         let modelFooter = document.createElement("div");
         modelFooter.setAttribute("class","modal-footer");
         let closeButton = document.createElement("button");
@@ -165,6 +167,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
     
     
 );
+//search menu function
 function searchMenu(){
     let allCards = document.getElementsByClassName("card menu");
     let searchText = document.getElementById("searchMenuName").value.toUpperCase();
@@ -177,6 +180,7 @@ function searchMenu(){
         allCards[index].style.display = "none";
     }   
 }
+//search table function
 function searchTable(){
     let allCards = document.getElementsByClassName("card table");
     let searchText = document.getElementById("searchTableName").value.toUpperCase();
@@ -193,6 +197,7 @@ function searchTable(){
       
     }   
 }
+// model table details function
 function tableDetails(table){
     document.getElementById("table-"+table.id).style.background="orange";
     document.getElementById("exampleModalLabel").innerHTML = table.name+"| Order Details";
@@ -253,10 +258,14 @@ function tableDetails(table){
         tableRow1.appendChild(td4);
         tableRow1.appendChild(td5);
         tableBody.appendChild(tableRow1);
-        console.log(table.orders[i]+" "+table.orders.length);
+        deleteButton.addEventListener("click",()=>{
+            deleteOrder(table,i)
+        })
+      
     }
     displayTable.appendChild(tableBody);
     modelBody.appendChild(displayTable);
+    
     document.getElementById("modelHeaderClose").addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
         }
@@ -265,7 +274,7 @@ function tableDetails(table){
         document.getElementById("table-"+table.id).style.background="white";
     })
 }
-
+// drag and drop function
 function dragDrop(event){
     event.preventDefault();
     let tableIdName = this.id;
@@ -286,11 +295,27 @@ function dragDrop(event){
         orderId = tables[tableId-1].orders.length-1;
         tables[tableId-1].orders[orderId].quantity=1;
     }
-    tables[tableId-1].totalCost=0;
-    for(let i = 0;i<tables[tableId-1].orders.length;i++){
-        tables[tableId-1].totalCost+=(tables[tableId-1].orders[i].cost)*(tables[tableId-1].orders[i].quantity);
-       
-    }
+    tables[tableId-1].totalCost=calculateTotalCost(tables[tableId-1]);
     tables[tableId-1].totalItems+=1;
     document.getElementById(tableIdName).children[0].children[1].innerHTML=`cost: ${tables[tableId-1].totalCost} | total items: ${tables[tableId-1].totalItems}`
+}
+//calculate total cost of table 
+function calculateTotalCost(table){
+    let totalCost = 0;
+    for(let i = 0;i<table.orders.length;i++){
+        totalCost+=(table.orders[i].cost)*(table.orders[i].quantity);
+    }
+    return totalCost;
+}
+function deleteOrder(table,index){
+    let orderIndex=0;
+    for(let i = 0 ; i < items;i++){
+        if(index===items[i].id)
+            orderIndex = i;
+    }
+    table.totalItems -= table.orders[orderIndex].quantity;
+    table.orders.splice(orderIndex,1);
+    table.totalCost = calculateTotalCost(table);
+    tableDetails(table);
+    document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
 }
