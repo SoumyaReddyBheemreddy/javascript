@@ -283,6 +283,9 @@ function tableDetails(table){
     displayTable.appendChild(tableBody);
     modelBody.appendChild(displayTable);
     modelBody.appendChild(totalPrice);
+    $('#exampleModal').on('hide.bs.modal',()=>  {
+        document.getElementById("table-"+table.id).style.background="white";
+      })
     document.getElementById("modelHeaderClose").addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
         }
@@ -294,6 +297,7 @@ function tableDetails(table){
         table.totalItems=0;
         document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
     })
+    
 }
 // drag and drop function
 function dragDrop(event){
