@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
             tableCard.setAttribute("class","card mt-2 table");
             tableCard.setAttribute("id","table-"+(i+1));
             tableCard.setAttribute("data-toggle","modal");
-            tableCard.setAttribute("data-target","#exampleModal");
+            tableCard.setAttribute("data-target","#exampleModal-"+(i+1));
             tableBody.setAttribute("class","card-body");
             tableTitle.setAttribute("class","card-title");
             tableCost.setAttribute("class","card-subtitle mb-2 text-muted pt-2");
@@ -95,6 +95,53 @@ document.addEventListener("DOMContentLoaded",  function load(){
                 event.preventDefault();
             });
             document.getElementById("table-"+(i+1)).addEventListener("drop",dragDrop);
+            let model = document.createElement("div");
+            model.setAttribute("class","modal fade");
+            model.setAttribute("id","exampleModal-"+(i+1));
+            model.setAttribute("tabindex",-1);
+            model.setAttribute("role","dialog");
+            model.setAttribute("aria-labelledby","exampleModalLabel");
+            model.setAttribute("aria-hidden","true");
+            let modelDialog= document.createElement("div");
+            modelDialog.setAttribute("class","modal-dialog modal-dialog-centered modal-lg");
+            modelDialog.setAttribute("role","document");
+            let modelContent = document.createElement("div");
+            modelContent.setAttribute("class","modal-content");
+            //model header
+            let modelHeader = document.createElement("div");
+            modelHeader.setAttribute("class","modal-header bg-primary text-white");
+            let modelTitle = document.createElement("h5");
+            modelTitle.setAttribute("class","modal-title");
+            modelTitle.setAttribute("id","exampleModalLabel-"+(i+1));
+            modelTitle.innerHTML = "Table";
+            let headerClose = document.createElement("button");
+            headerClose.setAttribute("id","modelHeaderClose-"+(i+1))
+            headerClose.setAttribute("type","button");
+            headerClose.setAttribute("class","btn-close btn-close-white");
+            headerClose.setAttribute("data-dismiss","modal");
+            headerClose.setAttribute("aria-label","Close");
+            //model body
+            let modelBody = document.createElement("div");
+            modelBody.setAttribute("class","modal-body");
+            modelBody.setAttribute("id","modelBodyId-"+(i+1));
+            //model footer
+            let modelFooter = document.createElement("div");
+            modelFooter.setAttribute("class","modal-footer");
+            let closeButton = document.createElement("button");
+            closeButton.setAttribute("id","modelFooterClose-"+(i+1));
+            closeButton.setAttribute("type","button");
+            closeButton.setAttribute("class","btn btn-secondary");
+            closeButton.setAttribute("data-dismiss","modal");
+            closeButton.innerHTML = "CLOSE SESSION (GENERATE BILL)";
+            modelFooter.appendChild(closeButton);
+            modelHeader.appendChild(modelTitle);
+            modelHeader.appendChild(headerClose);
+            modelContent.appendChild(modelHeader);
+            modelContent.appendChild(modelBody);
+            modelContent.appendChild(modelFooter);
+            modelDialog.appendChild(modelContent);
+            model.appendChild(modelDialog);
+            document.body.appendChild(model);
         }
         
         //loading menu item details
@@ -127,53 +174,7 @@ document.addEventListener("DOMContentLoaded",  function load(){
             });
         }
         // setting  model
-        let model = document.createElement("div");
-        model.setAttribute("class","modal fade");
-        model.setAttribute("id","exampleModal");
-        model.setAttribute("tabindex",-1);
-        model.setAttribute("role","dialog");
-        model.setAttribute("aria-labelledby","exampleModalLabel");
-        model.setAttribute("aria-hidden","true");
-        let modelDialog= document.createElement("div");
-        modelDialog.setAttribute("class","modal-dialog modal-dialog-centered modal-lg");
-        modelDialog.setAttribute("role","document");
-        let modelContent = document.createElement("div");
-        modelContent.setAttribute("class","modal-content");
-        //model header
-        let modelHeader = document.createElement("div");
-        modelHeader.setAttribute("class","modal-header bg-primary text-white");
-        let modelTitle = document.createElement("h5");
-        modelTitle.setAttribute("class","modal-title");
-        modelTitle.setAttribute("id","exampleModalLabel");
-        modelTitle.innerHTML = "Table";
-        let headerClose = document.createElement("button");
-        headerClose.setAttribute("id","modelHeaderClose")
-        headerClose.setAttribute("type","button");
-        headerClose.setAttribute("class","btn-close btn-close-white");
-        headerClose.setAttribute("data-dismiss","modal");
-        headerClose.setAttribute("aria-label","Close");
-        //model body
-        let modelBody = document.createElement("div");
-        modelBody.setAttribute("class","modal-body");
-        modelBody.setAttribute("id","modelBodyId");
-        //model footer
-        let modelFooter = document.createElement("div");
-        modelFooter.setAttribute("class","modal-footer");
-        let closeButton = document.createElement("button");
-        closeButton.setAttribute("id","modelFooterClose");
-        closeButton.setAttribute("type","button");
-        closeButton.setAttribute("class","btn btn-secondary");
-        closeButton.setAttribute("data-dismiss","modal");
-        closeButton.innerHTML = "CLOSE SESSION (GENERATE BILL)";
-        modelFooter.appendChild(closeButton);
-        modelHeader.appendChild(modelTitle);
-        modelHeader.appendChild(headerClose);
-        modelContent.appendChild(modelHeader);
-        modelContent.appendChild(modelBody);
-        modelContent.appendChild(modelFooter);
-        modelDialog.appendChild(modelContent);
-        model.appendChild(modelDialog);
-        document.body.appendChild(model);
+       
     }
     
     
@@ -198,8 +199,7 @@ function searchTable(){
     
     for(let index=0;index<allCards.length;index++){
         let item = allCards[index].children[0].children[0].innerHTML.toUpperCase();
-        console.log(item);
-       
+     
         if(item.includes(searchText))
             allCards[index].setAttribute("class","card mt-2 table"); 
         else
@@ -210,8 +210,8 @@ function searchTable(){
 // model table details function
 function tableDetails(table){
     document.getElementById("table-"+table.id).style.background="orange";
-    document.getElementById("exampleModalLabel").innerHTML = table.name+"| Order Details";
-    let modelBody = document.getElementById("modelBodyId");
+    document.getElementById("exampleModalLabel-"+(table.id)).innerHTML = table.name+"| Order Details";
+    let modelBody = document.getElementById("modelBodyId-"+(table.id));
     if(modelBody.hasChildNodes()){
         modelBody.innerHTML=""
     }
@@ -252,7 +252,7 @@ function tableDetails(table){
         let td3 = document.createElement("td");
         td3.innerHTML=table.orders[i].cost;
         let td4 = document.createElement("input");
-        td4.setAttribute("id","itemQuantity-"+(i+1));
+        td4.setAttribute("id","table-"+(table.id)+" itemQuantity-"+(i+1));
         td4.setAttribute("type","number");
         td4.setAttribute("class","form-control form-control-sm my-2");
         td4.setAttribute("min","1");
@@ -277,20 +277,20 @@ function tableDetails(table){
       
     }
     let totalPrice = document.createElement("p");
-    totalPrice.setAttribute("id","modalTotalPrice");
+    totalPrice.setAttribute("id","modalTotalPrice-"+(table.id));
     totalPrice.setAttribute("class","text-center");
     totalPrice.innerHTML=`Total Price: ${table.totalCost}`;
     displayTable.appendChild(tableBody);
     modelBody.appendChild(displayTable);
     modelBody.appendChild(totalPrice);
-    $('#exampleModal').on('hide.bs.modal',()=>  {
+    $('#exampleModal-'+(table.id)).on('hide.bs.modal',()=>  {
         document.getElementById("table-"+table.id).style.background="white";
       })
-    document.getElementById("modelHeaderClose").addEventListener("click",()=>{
+    document.getElementById("modelHeaderClose-"+(table.id)).addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
         }
     )
-    document.getElementById("modelFooterClose").addEventListener("click",()=>{
+    document.getElementById("modelFooterClose-"+(table.id)).addEventListener("click",()=>{
         document.getElementById("table-"+table.id).style.background="white";
         table.orders = [];
         table.totalCost=0;
@@ -316,9 +316,16 @@ function dragDrop(event){
         }
     }
     if(isNaN(orderId)){
-        tables[tableId-1].orders.push(items[itemId-1]);
-        orderId = tables[tableId-1].orders.length-1;
-        tables[tableId-1].orders[orderId].quantity=1;
+        
+        let order = {
+            id:items[itemId-1].id,
+            name:items[itemId-1].name,
+            cost:items[itemId-1].cost,
+            course:items[itemId-1].course,
+            quantity:1
+        }
+        tables[tableId-1].orders.push(order);
+        
     }
     tables[tableId-1].totalCost=calculateTotalCost(tables[tableId-1]);
     tables[tableId-1].totalItems+=1;
@@ -338,15 +345,15 @@ function deleteOrder(table,index){
     table.orders.splice(index,1);
     table.totalCost = calculateTotalCost(table);
     tableDetails(table);
-    document.getElementById("modalTotalPrice").innerHTML = `Total Price: ${table.totalCost}`;
+    document.getElementById("modalTotalPrice-"+(table.id)).innerHTML = `Total Price: ${table.totalCost}`;
     document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
 }
 function updateItemQuatity(table,index){
-    let order=table.orders[index]
-    order.quantity = parseInt(document.getElementById("itemQuantity-"+(index+1)).value);
+    let updateQuatity = parseInt(document.getElementById("table-"+(table.id)+" itemQuantity-"+(index+1)).value);
+    table.orders[index].quantity = updateQuatity;
     table.totalItems = updatedTotalQuantity(table);
     table.totalCost=calculateTotalCost(table);
-    document.getElementById("modalTotalPrice").innerHTML = `Total Price: ${table.totalCost}`;
+    document.getElementById("modalTotalPrice-"+(table.id)).innerHTML = `Total Price: ${table.totalCost}`;
     document.getElementById("table-"+table.id).children[0].children[1].innerHTML=`cost: ${table.totalCost} | total items: ${table.totalItems}`;
 }
 function updatedTotalQuantity(table){
